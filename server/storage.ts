@@ -112,7 +112,7 @@ export class DatabaseStorage implements IStorage {
     return await db
       .select()
       .from(secretMessages)
-      .where(eq(secretMessages.firebaseUid, firebaseUid))
+      .where(and(eq(secretMessages.firebaseUid, firebaseUid),eq(secretMessages.viewed,false)))
       .orderBy(desc(secretMessages.createdAt));
   }
 

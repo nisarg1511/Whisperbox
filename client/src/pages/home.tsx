@@ -76,7 +76,7 @@ export default function Home() {
                 </Button>
               </Link>
             )}
-            <Link href="/create">
+            <Link href="/create-secret">
               <Button className="gap-2">
                 <Lock className="w-4 h-4" />
                 Create Secret Message
@@ -160,74 +160,6 @@ export default function Home() {
               </p>
             </div>
           </div>
-        </div>
-
-        {/* Confession Form Section */}
-        <div>
-          <h2 className="text-3xl font-bold mb-8">Share Your Confession</h2>
-          <Card className="bg-black/5">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Send className="w-5 h-5" />
-                Express Yourself
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="content"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Textarea
-                            placeholder="Type your confession here..."
-                            className="min-h-[100px] resize-none"
-                            {...field}
-                          />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <Button type="submit" className="w-full gap-2">
-                    <Send className="w-4 h-4" />
-                    Share Anonymously
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Recent Confessions */}
-        <div className="space-y-6">
-          <h2 className="text-3xl font-bold">Recent Confessions</h2>
-          <p className="text-muted-foreground">
-            Read anonymous confessions shared by others. Your confession could be next.
-          </p>
-          {isLoading ? (
-            <div className="space-y-4">
-              {[...Array(3)].map((_, i) => (
-                <Card key={i} className="animate-pulse">
-                  <CardContent className="h-24" />
-                </Card>
-              ))}
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {confessions?.map((confession) => (
-                <Card key={confession.id} className="bg-black/5">
-                  <CardContent className="pt-6">
-                    <p className="text-muted-foreground">{confession.content}</p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      {new Date(confession.createdAt).toLocaleDateString()}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </div>

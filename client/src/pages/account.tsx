@@ -138,7 +138,7 @@ export default function AccountPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">My Confessions</h2>
-            <Link href="/create">
+            <Link href="/create-confession">
               <Button variant="outline" className="gap-2">
                 <Edit2 className="w-4 h-4" />
                 Create New
@@ -224,7 +224,7 @@ export default function AccountPage() {
         <div className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-semibold">My Secret Messages</h2>
-            <Link href="/create">
+            <Link href="/create-secret">
               <Button variant="outline" className="gap-2">
                 <Key className="w-4 h-4" />
                 New Secret
