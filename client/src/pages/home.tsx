@@ -11,9 +11,12 @@ import { insertConfessionSchema, type Confession } from "@shared/schema";
 import { Lock, Send } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
   const { toast } = useToast();
+  const { user } = useAuth();
+
   const form = useForm({
     resolver: zodResolver(insertConfessionSchema),
     defaultValues: {
@@ -50,12 +53,23 @@ export default function Home() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-400 bg-clip-text text-transparent">
             Secret Confessions
           </h1>
-          <Link href="/create">
-            <Button variant="outline" className="gap-2">
-              <Lock className="w-4 h-4" />
-              Create Secret Message
-            </Button>
-          </Link>
+          <div className="flex gap-2">
+            {user ? (
+              <Button variant="outline" onClick={() => window.location.href = "/auth"}>
+                Account
+              </Button>
+            ) : (
+              <Button variant="outline" onClick={() => window.location.href = "/auth"}>
+                Sign In
+              </Button>
+            )}
+            <Link href="/create">
+              <Button variant="outline" className="gap-2">
+                <Lock className="w-4 h-4" />
+                Create Secret Message
+              </Button>
+            </Link>
+          </div>
         </div>
 
         <Card>
