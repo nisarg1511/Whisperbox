@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, boolean } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -13,7 +13,8 @@ export const confessions = pgTable("confessions", {
   id: serial("id").primaryKey(),
   content: text("content").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  userId: serial("user_id").references(() => users.id),
+  firebaseUid: text("firebase_uid"),  // Optional field for authenticated users
+  isAnonymous: boolean("is_anonymous").default(true).notNull(),
 });
 
 export const secretMessages = pgTable("secret_messages", {
@@ -23,7 +24,8 @@ export const secretMessages = pgTable("secret_messages", {
   viewed: boolean("viewed").default(false).notNull(),
   expiresAt: timestamp("expires_at").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-  userId: serial("user_id").references(() => users.id),
+  firebaseUid: text("firebase_uid"),  // Optional field for authenticated users
+  isAnonymous: boolean("is_anonymous").default(true).notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({

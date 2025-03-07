@@ -1,106 +1,61 @@
-import { createContext, ReactNode, useContext } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { insertUserSchema, type User } from "@shared/schema";
-import { apiRequest } from "@/lib/queryClient";
+import { createContext, ReactNode, useContext, useEffect, useState } from "react";
+import { auth, googleProvider } from "@/lib/firebase";
+import { signInWithPopup, signOut, onAuthStateChanged, type User } from "firebase/auth";
 import { useToast } from "@/hooks/use-toast";
-import { queryClient } from "@/lib/queryClient";
 
 type AuthContextType = {
   user: User | null;
   isLoading: boolean;
-  error: Error | null;
-  login: (username: string, password: string) => Promise<void>;
-  register: (username: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   logout: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const {
-    data: user,
-    error,
-    isLoading,
-  } = useQuery<User | null>({
-    queryKey: ["/api/user"],
-    queryFn: async ({ queryKey }) => {
-      try {
-        const res = await fetch(queryKey[0], { credentials: "include" });
-        if (res.status === 401) return null;
-        if (!res.ok) throw new Error("Failed to fetch user");
-        return res.json();
-      } catch (error) {
-        console.error("Error fetching user:", error);
-        return null;
-      }
-    },
-  });
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      setIsLoading(false);
+    });
 
-  const loginMutation = useMutation({
-    mutationFn: async (credentials: { username: string; password: string }) => {
-      await apiRequest("POST", "/api/login", credentials);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    return () => unsubscribe();
+  }, []);
+
+  const signInWithGoogle = async () => {
+    try {
+      await signInWithPopup(auth, googleProvider);
       toast({
         title: "Success",
-        description: "Logged in successfully",
+        description: "Successfully signed in with Google",
       });
-    },
-    onError: (error: Error) => {
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Invalid username or password",
+        description: "Failed to sign in with Google",
         variant: "destructive",
       });
-    },
-  });
-
-  const registerMutation = useMutation({
-    mutationFn: async (credentials: { username: string; password: string }) => {
-      await apiRequest("POST", "/api/register", credentials);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({
-        title: "Success",
-        description: "Account created successfully",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: "Failed to create account",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const logoutMutation = useMutation({
-    mutationFn: async () => {
-      await apiRequest("POST", "/api/logout");
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/user"] });
-      toast({
-        title: "Success",
-        description: "Logged out successfully",
-      });
-    },
-  });
-
-  const login = async (username: string, password: string) => {
-    await loginMutation.mutateAsync({ username, password });
-  };
-
-  const register = async (username: string, password: string) => {
-    await registerMutation.mutateAsync({ username, password });
+    }
   };
 
   const logout = async () => {
-    await logoutMutation.mutateAsync();
+    try {
+      await signOut(auth);
+      toast({
+        title: "Success",
+        description: "Successfully signed out",
+      });
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to sign out",
+        variant: "destructive",
+      });
+    }
   };
 
   return (
@@ -108,9 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         user,
         isLoading,
-        error,
-        login,
-        register,
+        signInWithGoogle,
         logout,
       }}
     >

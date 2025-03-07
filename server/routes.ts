@@ -13,14 +13,34 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.json(confessions);
   });
 
+  app.get("/api/my/confessions", async (req, res) => {
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    if (!firebaseUid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const confessions = await storage.getUserConfessions(firebaseUid);
+    res.json(confessions);
+  });
+
   app.post("/api/confessions", async (req, res) => {
     const result = insertConfessionSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ message: "Invalid confession data" });
     }
 
-    const confession = await storage.createConfession(result.data);
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    const confession = await storage.createConfession(result.data, firebaseUid);
     res.status(201).json(confession);
+  });
+
+  app.delete("/api/confessions/:id", async (req, res) => {
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    if (!firebaseUid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    await storage.deleteUserConfession(Number(req.params.id), firebaseUid);
+    res.status(204).send();
   });
 
   app.post("/api/secrets", async (req, res) => {
@@ -29,8 +49,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       return res.status(400).json({ message: "Invalid message data" });
     }
 
-    const message = await storage.createSecretMessage(result.data);
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    const message = await storage.createSecretMessage(result.data, firebaseUid);
     res.status(201).json({ token: message.token });
+  });
+
+  app.get("/api/my/secrets", async (req, res) => {
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    if (!firebaseUid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    const messages = await storage.getUserSecretMessages(firebaseUid);
+    res.json(messages);
   });
 
   app.get("/api/secrets/:token", async (req, res) => {
@@ -51,10 +81,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     await storage.markMessageAsViewed(token);
-    res.json({ 
+    res.json({
       content: message.content,
       expiresAt: message.expiresAt.toISOString()
     });
+  });
+
+  app.delete("/api/secrets/:id", async (req, res) => {
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    if (!firebaseUid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    await storage.deleteUserSecretMessage(Number(req.params.id), firebaseUid);
+    res.status(204).send();
   });
 
   const httpServer = createServer(app);
