@@ -32,7 +32,11 @@ export default function Home() {
     try {
       await apiRequest("POST", "/api/confessions", data);
       form.reset();
+      // Invalidate both public and user's confessions
       queryClient.invalidateQueries({ queryKey: ["/api/confessions"] });
+      if (user) {
+        queryClient.invalidateQueries({ queryKey: ["/api/my/confessions"] });
+      }
       toast({
         title: "Confession posted",
         description: "Your confession has been shared anonymously.",
