@@ -55,13 +55,13 @@ export default function Home() {
           </h1>
           <div className="flex gap-2">
             {user ? (
-              <Button variant="outline" onClick={() => window.location.href = "/auth"}>
-                Account
-              </Button>
+              <Link href="/account">
+                <Button variant="outline">Account</Button>
+              </Link>
             ) : (
-              <Button variant="outline" onClick={() => window.location.href = "/auth"}>
-                Sign In
-              </Button>
+              <Link href="/auth">
+                <Button variant="outline">Sign In</Button>
+              </Link>
             )}
             <Link href="/create">
               <Button variant="outline" className="gap-2">
