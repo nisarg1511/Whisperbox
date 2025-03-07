@@ -17,20 +17,20 @@ export interface IStorage {
   getConfessions(): Promise<Confession[]>;
   getUserConfessions(firebaseUid: string): Promise<Confession[]>;
   createConfession(confession: InsertConfession, firebaseUid?: string): Promise<Confession>;
+  updateUserConfession(id: number, firebaseUid: string, confession: InsertConfession): Promise<void>;
+  deleteUserConfession(id: number, firebaseUid: string): Promise<void>;
 
   createSecretMessage(message: InsertSecretMessage, firebaseUid?: string): Promise<SecretMessage>;
   getSecretMessage(token: string): Promise<SecretMessage | undefined>;
   getUserSecretMessages(firebaseUid: string): Promise<SecretMessage[]>;
   markMessageAsViewed(token: string): Promise<void>;
   deleteExpiredMessages(): Promise<void>;
+  deleteUserSecretMessage(id: number, firebaseUid: string): Promise<void>;
 
   // User-related operations
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-
-  deleteUserConfession(id: number, firebaseUid: string): Promise<void>;
-  deleteUserSecretMessage(id: number, firebaseUid: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -60,6 +60,29 @@ export class DatabaseStorage implements IStorage {
       })
       .returning();
     return created;
+  }
+
+  async updateUserConfession(id: number, firebaseUid: string, confession: InsertConfession): Promise<void> {
+    await db
+      .update(confessions)
+      .set({ content: confession.content })
+      .where(
+        and(
+          eq(confessions.id, id),
+          eq(confessions.firebaseUid, firebaseUid)
+        )
+      );
+  }
+
+  async deleteUserConfession(id: number, firebaseUid: string): Promise<void> {
+    await db
+      .delete(confessions)
+      .where(
+        and(
+          eq(confessions.id, id),
+          eq(confessions.firebaseUid, firebaseUid)
+        )
+      );
   }
 
   async createSecretMessage(message: InsertSecretMessage, firebaseUid?: string): Promise<SecretMessage> {
@@ -106,6 +129,17 @@ export class DatabaseStorage implements IStorage {
       .where(lte(secretMessages.expiresAt, new Date()));
   }
 
+  async deleteUserSecretMessage(id: number, firebaseUid: string): Promise<void> {
+    await db
+      .delete(secretMessages)
+      .where(
+        and(
+          eq(secretMessages.id, id),
+          eq(secretMessages.firebaseUid, firebaseUid)
+        )
+      );
+  }
+
   // User-related operations
   async getUser(id: number): Promise<User | undefined> {
     const [user] = await db
@@ -129,28 +163,6 @@ export class DatabaseStorage implements IStorage {
       .values(user)
       .returning();
     return created;
-  }
-
-  async deleteUserConfession(id: number, firebaseUid: string): Promise<void> {
-    await db
-      .delete(confessions)
-      .where(
-        and(
-          eq(confessions.id, id),
-          eq(confessions.firebaseUid, firebaseUid)
-        )
-      );
-  }
-
-  async deleteUserSecretMessage(id: number, firebaseUid: string): Promise<void> {
-    await db
-      .delete(secretMessages)
-      .where(
-        and(
-          eq(secretMessages.id, id),
-          eq(secretMessages.firebaseUid, firebaseUid)
-        )
-      );
   }
 }
 

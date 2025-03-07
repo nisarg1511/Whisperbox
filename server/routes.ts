@@ -33,6 +33,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     res.status(201).json(confession);
   });
 
+  app.patch("/api/confessions/:id", async (req, res) => {
+    const firebaseUid = req.headers["x-firebase-uid"] as string;
+    if (!firebaseUid) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const result = insertConfessionSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ message: "Invalid confession data" });
+    }
+
+    await storage.updateUserConfession(Number(req.params.id), firebaseUid, result.data);
+    res.status(200).send();
+  });
+
   app.delete("/api/confessions/:id", async (req, res) => {
     const firebaseUid = req.headers["x-firebase-uid"] as string;
     if (!firebaseUid) {
