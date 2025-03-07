@@ -70,7 +70,7 @@ export default function ViewSecret() {
           </h1>
         </div>
 
-        <Card>
+        <Card className="bg-black/5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="w-5 h-5" />
