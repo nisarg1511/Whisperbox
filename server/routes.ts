@@ -2,9 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { insertConfessionSchema, insertSecretMessageSchema } from "@shared/schema";
-import { z } from "zod";
+import { setupAuth } from "./auth";
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Set up authentication routes and middleware
+  setupAuth(app);
+
   app.get("/api/confessions", async (_req, res) => {
     const confessions = await storage.getConfessions();
     res.json(confessions);
