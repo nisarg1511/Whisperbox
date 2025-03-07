@@ -87,83 +87,125 @@ export default function Home() {
       </div>
 
       {/* Features Section */}
-      <div className="max-w-5xl mx-auto px-6 py-20">
-        <div className="grid md:grid-cols-3 gap-8 mb-16">
-          <Card className="bg-black/5">
-            <CardHeader>
-              <Shield className="w-6 h-6 mb-2" />
-              <CardTitle>Anonymous Sharing</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Share your thoughts without revealing your identity. No account required.
-              </p>
-            </CardContent>
-          </Card>
+      <div className="max-w-5xl mx-auto px-6 py-20 space-y-20">
+        {/* Feature Cards */}
+        <div>
+          <h2 className="text-3xl font-bold mb-8">Platform Features</h2>
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="bg-black/5">
+              <CardHeader>
+                <Shield className="w-6 h-6 mb-2" />
+                <CardTitle>Anonymous Sharing</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Share your thoughts without revealing your identity. No account required.
+                  Perfect for those moments when you need to express yourself freely.
+                </p>
+              </CardContent>
+            </Card>
 
-          <Card className="bg-black/5">
-            <CardHeader>
-              <Key className="w-6 h-6 mb-2" />
-              <CardTitle>One-Time Messages</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                Create messages that self-destruct after being viewed once.
-              </p>
-            </CardContent>
-          </Card>
+            <Card className="bg-black/5">
+              <CardHeader>
+                <Key className="w-6 h-6 mb-2" />
+                <CardTitle>One-Time Messages</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  Create messages that self-destruct after being viewed once.
+                  Ideal for sharing sensitive information securely.
+                </p>
+              </CardContent>
+            </Card>
 
+            <Card className="bg-black/5">
+              <CardHeader>
+                <Clock className="w-6 h-6 mb-2" />
+                <CardTitle>24h Expiry</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-muted-foreground">
+                  All messages automatically expire after 24 hours for extra security.
+                  Your secrets won't linger forever.
+                </p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+
+        {/* How it Works Section */}
+        <div>
+          <h2 className="text-3xl font-bold mb-8">How It Works</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">Share Anonymously</h3>
+              <p className="text-muted-foreground">
+                Post your thoughts without revealing your identity. Your confessions are
+                completely anonymous, giving you the freedom to express yourself openly.
+              </p>
+              <p className="text-muted-foreground">
+                Optional account creation allows you to manage and track your posts
+                while maintaining anonymity.
+              </p>
+            </div>
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">Create Secret Messages</h3>
+              <p className="text-muted-foreground">
+                Generate one-time viewable links to share sensitive information.
+                Perfect for sharing passwords, private notes, or confidential details.
+              </p>
+              <p className="text-muted-foreground">
+                Messages self-destruct after being viewed or within 24 hours,
+                ensuring your information stays secure.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Confession Form Section */}
+        <div>
+          <h2 className="text-3xl font-bold mb-8">Share Your Confession</h2>
           <Card className="bg-black/5">
             <CardHeader>
-              <Clock className="w-6 h-6 mb-2" />
-              <CardTitle>24h Expiry</CardTitle>
+              <CardTitle className="flex items-center gap-2">
+                <Send className="w-5 h-5" />
+                Express Yourself
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                All messages automatically expire after 24 hours for extra security.
-              </p>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="content"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Type your confession here..."
+                            className="min-h-[100px] resize-none"
+                            {...field}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                  <Button type="submit" className="w-full gap-2">
+                    <Send className="w-4 h-4" />
+                    Share Anonymously
+                  </Button>
+                </form>
+              </Form>
             </CardContent>
           </Card>
         </div>
 
-        {/* Confession Form */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Send className="w-5 h-5" />
-              Share Your Confession
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Type your confession here..."
-                          className="min-h-[100px] resize-none"
-                          {...field}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-                <Button type="submit" className="w-full gap-2">
-                  <Send className="w-4 h-4" />
-                  Share Anonymously
-                </Button>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
-
         {/* Recent Confessions */}
-        <div className="mt-16 space-y-4">
-          <h2 className="text-2xl font-semibold">Recent Confessions</h2>
+        <div className="space-y-6">
+          <h2 className="text-3xl font-bold">Recent Confessions</h2>
+          <p className="text-muted-foreground">
+            Read anonymous confessions shared by others. Your confession could be next.
+          </p>
           {isLoading ? (
             <div className="space-y-4">
               {[...Array(3)].map((_, i) => (
